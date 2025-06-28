@@ -1,0 +1,26 @@
+## Telegram bot Quiz
+
+Ссылка: @AIMustafin_bot
+
+
+Функционал:
+
+1) Бот Quiz задает 10 вопросов, на которые пользователь должен дать ответ
+2) При получении ответов на все 10 вопросов Бот Quiz выдает статистику правильных ответов
+
+Курс "Разработчик нейросетей"
+
+<!--
+**IlnurMustafin/IlnurMustafin** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+
+Here are some ideas to get you started:
+
+- 🔭 I’m currently working on ...
+- 🌱 I’m currently learning ...
+- 👯 I’m looking to collaborate on ...
+- 🤔 I’m looking for help with ...
+- 💬 Ask me about ...
+- 📫 How to reach me: ...
+- 😄 Pronouns: ...
+- ⚡ Fun fact: ...
+-->
