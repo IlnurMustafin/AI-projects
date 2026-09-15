@@ -32,7 +32,7 @@ class NeuroProjectManagerRAG:
     
     def _load_docx_file(self) -> str:
         """Загрузка текста из .docx файла"""
-        print(f"📖 Загрузка базы знаний из: {self.docx_path}")
+        print(f" Загрузка базы знаний из: {self.docx_path}")
         
         try:
             doc = docx.Document(self.docx_path)
@@ -47,22 +47,22 @@ class NeuroProjectManagerRAG:
             if not knowledge_text:
                 raise ValueError("Файл .docx пуст или не содержит текста")
             
-            print(f"✅ Загружено {len(knowledge_text)} символов")
+            print(f" Загружено {len(knowledge_text)} символов")
             
             return knowledge_text
             
         except FileNotFoundError:
-            error_msg = f"❌ Файл не найден: {self.docx_path}"
+            error_msg = f" Файл не найден: {self.docx_path}"
             print(error_msg)
             raise FileNotFoundError(error_msg)
         except Exception as e:
-            error_msg = f"❌ Ошибка загрузки .docx файла: {str(e)}"
+            error_msg = f" Ошибка загрузки .docx файла: {str(e)}"
             print(error_msg)
             raise
     
     def _init_models(self):
         """Инициализация моделей"""
-        print("🔄 Инициализация моделей...")
+        print(" Инициализация моделей...")
         
         # Основная модель через Vsegpt
         try:
@@ -71,9 +71,9 @@ class NeuroProjectManagerRAG:
                 base_url="https://api.vsegpt.ru/v1"
             )
             self.main_model = "gpt-3.5-turbo"
-            print("✅ Vsegpt API (GPT) инициализирован, модель: gpt-3.5-turbo")
+            print(" Vsegpt API (GPT) инициализирован, модель: gpt-3.5-turbo")
         except Exception as e:
-            print(f"⚠️  Ошибка инициализации Vsegpt API: {e}")
+            print(f"  Ошибка инициализации Vsegpt API: {e}")
             print("   Проверьте API ключ и подключение")
             self.openai_client = None
             self.main_model = None
@@ -83,11 +83,11 @@ class NeuroProjectManagerRAG:
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             model_kwargs={'device': 'cpu'}
         )
-        print("✅ Эмбеддинги загружены")
+        print(" Эмбеддинги загружены")
     
     def _extract_sections_from_text(self, text: str) -> Dict[str, str]:
         """Извлечение разделов из текста базы знаний"""
-        print("\n🔍 Извлечение разделов из документа...")
+        print("\n Извлечение разделов из документа...")
         
         sections = {}
         lines = text.split('\n')
@@ -121,7 +121,7 @@ class NeuroProjectManagerRAG:
                     current_section = category
                     current_content = [line_original]
                     found_section = True
-                    print(f"   ✅ Найден раздел: '{line_original[:50]}...' -> категория '{category}'")
+                    print(f" Найден раздел: '{line_original[:50]}...' -> категория '{category}'")
                     break
             
             if not found_section and current_section:
@@ -143,7 +143,7 @@ class NeuroProjectManagerRAG:
             for sub_name, sub_content in подэтапы.items():
                 sections[f"этапы_{sub_name}"] = sub_content
         
-        print(f"📊 Извлечено разделов: {len(sections)}")
+        print(f" Извлечено разделов: {len(sections)}")
         for category, content in sections.items():
             if len(content) > 100:
                 print(f"   • {category}: {len(content)} символов")
@@ -180,7 +180,7 @@ class NeuroProjectManagerRAG:
         if current_substage:
             substages[current_substage] = "\n".join(current_content)
         
-        print(f"   📑 Извлечено подэтапов: {len(substages)}")
+        print(f" Извлечено подэтапов: {len(substages)}")
         for name in substages:
             print(f"     - {name}")
         
@@ -188,7 +188,7 @@ class NeuroProjectManagerRAG:
     
     def _setup_rag_system(self):
         """Настройка RAG системы с улучшенным поиском"""
-        print("🔧 Создание векторной базы знаний...")
+        print(" Создание векторной базы знаний...")
         
         # Извлечение разделов
         sections = self._extract_sections_from_text(self.knowledge_text)
@@ -224,7 +224,7 @@ class NeuroProjectManagerRAG:
                     all_docs.extend(chunk_docs[1:])  # Первый чанк уже добавлен
                     print(f"   📄 Раздел '{category}' разбит на {len(chunk_docs)} чанков")
         
-        print(f"📊 Итого документов: {len(all_docs)}")
+        print(f" Итого документов: {len(all_docs)}")
         
         # Создаем векторное хранилище
         self.vector_store = Chroma.from_documents(
@@ -244,7 +244,7 @@ class NeuroProjectManagerRAG:
             }
         )
         
-        print("✅ RAG система настроена!")
+        print(" RAG система настроена!")
         
         # Сохраняем все документы для ручного поиска при необходимости
         self.all_docs = all_docs
@@ -254,7 +254,7 @@ class NeuroProjectManagerRAG:
     
     def _test_search_specific(self):
         """Тестирование поиска конкретных запросов"""
-        print("\n🧪 ТЕСТИРОВАНИЕ ПОИСКА ПО КОНКРЕТНЫМ ЗАПРОСАМ:")
+        print("\n ТЕСТИРОВАНИЕ ПОИСКА ПО КОНКРЕТНЫМ ЗАПРОСАМ:")
         
         test_queries = [
             ("разбить проект на подзадачи", ["декомпозиция", "этап 1", "подзадачи"]),
@@ -271,7 +271,7 @@ class NeuroProjectManagerRAG:
             try:
                 docs = self.retriever.invoke(query)
                 if docs:
-                    print(f"    ✅ Найдено {len(docs)} документов")
+                    print(f" Найдено {len(docs)} документов")
                     
                     found_keywords = []
                     for i, doc in enumerate(docs[:3]):
@@ -294,14 +294,14 @@ class NeuroProjectManagerRAG:
                     # Проверяем, какие ключевые слова найдены
                     missing = [kw for kw in expected_keywords if kw not in found_keywords]
                     if missing:
-                        print(f"      ⚠️ Не найдены ключевые слова: {missing}")
+                        print(f" Не найдены ключевые слова: {missing}")
                     else:
-                        print(f"      ✅ Все ключевые слова найдены!")
+                        print(f" Все ключевые слова найдены!")
                 else:
                     print(f"    ❌ Документы не найдены")
                     
             except Exception as e:
-                print(f"    ⚠️ Ошибка: {e}")
+                print(f" Ошибка: {e}")
     
     def _find_relevant_docs_manual(self, query: str) -> List[Document]:
         """Ручной поиск релевантных документов (резервный метод)"""
@@ -366,16 +366,16 @@ class NeuroProjectManagerRAG:
             docs = self.retriever.invoke(query)
             
             if not docs:
-                print(f"[SEARCH] ❌ Стандартный поиск не дал результатов")
+                print(f"[SEARCH]  Стандартный поиск не дал результатов")
                 # Пробуем ручной поиск
                 docs = self._find_relevant_docs_manual(query)
                 if docs:
-                    print(f"[SEARCH] 🔍 Ручной поиск нашел {len(docs)} документов")
+                    print(f"[SEARCH]  Ручной поиск нашел {len(docs)} документов")
                 else:
-                    print(f"[SEARCH] ❌ Не найдено документов по запросу")
+                    print(f"[SEARCH]  Не найдено документов по запросу")
                     return "", []
             
-            print(f"[SEARCH] ✅ Найдено документов: {len(docs)}")
+            print(f"[SEARCH]  Найдено документов: {len(docs)}")
             
             # Фильтруем по категории (если указана)
             relevant_docs = []
@@ -386,7 +386,7 @@ class NeuroProjectManagerRAG:
                         relevant_docs.append(doc)
                 
                 if not relevant_docs:
-                    print(f"[SEARCH] ⚠️ Не найдено документов категории '{category}', беру все найденные")
+                    print(f"[SEARCH]  Не найдено документов категории '{category}', беру все найденные")
                     relevant_docs = docs[:5]
             else:
                 relevant_docs = docs[:5]
@@ -404,7 +404,7 @@ class NeuroProjectManagerRAG:
                 
                 context_parts.append(f"【{doc_category}{'/' + subcategory if subcategory else ''}】\n{content}")
                 
-                print(f"[SEARCH]   📄 Документ {i+1}:")
+                print(f"[SEARCH]    Документ {i+1}:")
                 print(f"            Категория: {doc_category}{'/' + subcategory if subcategory else ''}")
                 print(f"            Длина: {len(doc.page_content)} символов")
                 if i == 0:
@@ -416,7 +416,7 @@ class NeuroProjectManagerRAG:
             return context, relevant_docs
             
         except Exception as e:
-            print(f"[SEARCH] ⚠️ Ошибка поиска: {str(e)[:100]}")
+            print(f"[SEARCH]  Ошибка поиска: {str(e)[:100]}")
             return "", []
     
     def _generate_strict_response(self, query: str, context: str, category: str, docs: List[Document]) -> str:
@@ -497,7 +497,7 @@ class NeuroProjectManagerRAG:
             return answer
             
         except Exception as e:
-            print(f"⚠️ Ошибка генерации: {str(e)[:100]}")
+            print(f" Ошибка генерации: {str(e)[:100]}")
             return f"Извините, произошла ошибка. Найдено документов: {len(docs) if docs else 0}"
     
     def _create_context_from_docs(self, docs: List[Document]) -> str:
@@ -519,11 +519,11 @@ class NeuroProjectManagerRAG:
         """Ответ при отсутствии информации"""
         return f"❌ В базе знаний нет информации по запросу: '{query}'\n\n" \
                "Доступные темы в базе знаний:\n" \
-               "1. 📋 **Этапы управления ML-проектом** (инициализация, декомпозиция, планирование и т.д.)\n" \
-               "2. ⚠️ **Решение типовых проблем ML-проектов** (переобучение, дисбаланс классов и др.)\n" \
-               "3. 🛠️ **Технологический стек** (PyTorch, TensorFlow, MLflow, Docker и др.)\n" \
-               "4. ✅ **Шаблоны и чек-листы** (чек-лист старта проекта, чек-лист перед сдачей)\n" \
-               "5. 📘 **Общие принципы** (миссия, подход, тон общения)\n\n" \
+               "1.  **Этапы управления ML-проектом** (инициализация, декомпозиция, планирование и т.д.)\n" \
+               "2.  **Решение типовых проблем ML-проектов** (переобучение, дисбаланс классов и др.)\n" \
+               "3.  **Технологический стек** (PyTorch, TensorFlow, MLflow, Docker и др.)\n" \
+               "4.  **Шаблоны и чек-листы** (чек-лист старта проекта, чек-лист перед сдачей)\n" \
+               "5.  **Общие принципы** (миссия, подход, тон общения)\n\n" \
                "Попробуйте задать вопрос по одной из этих тем."
     
     def _extract_topic_summary(self, docs: List[Document]) -> str:
@@ -546,7 +546,7 @@ class NeuroProjectManagerRAG:
     
     def process_query(self, query: str) -> str:
         """Обработка запроса"""
-        print(f"\n📥 Запрос: {query}")
+        print(f"\n Запрос: {query}")
         
         # Определяем категорию
         query_lower = query.lower()
@@ -570,14 +570,14 @@ class NeuroProjectManagerRAG:
                 category = cat
                 break
         
-        print(f"   📍 Определена категория: '{category}'")
+        print(f"    Определена категория: '{category}'")
         
         # Поиск в базе знаний
-        print("🔍 Этап 2: Поиск в базе знаний...")
+        print(" Этап 2: Поиск в базе знаний...")
         context, docs = self._retrieve_context(query, category)
         
         # Генерация ответа
-        print(f"🧠 Этап 3: Генерация ответа ({self.main_model})...")
+        print(f" Этап 3: Генерация ответа ({self.main_model})...")
         answer = self._generate_strict_response(query, context, category, docs)
         
         print(f"   ✓ Ответ готов ({len(answer)} символов)")
@@ -612,13 +612,13 @@ def create_gradio_interface(docx_path: str):
     """Создание Gradio интерфейса"""
     
     if os.path.exists("./chroma_neuro_db"):
-        print("🗑️ Удаление старой векторной базы...")
+        print(" Удаление старой векторной базы...")
         import shutil
         try:
             shutil.rmtree("./chroma_neuro_db")
-            print("✅ Старая база удалена")
+            print(" Старая база удалена")
         except:
-            print("⚠️ Не удалось удалить старую базу")
+            print(" Не удалось удалить старую базу")
     
     try:
         manager = NeuroProjectManagerRAG(docx_path)
@@ -641,9 +641,9 @@ def create_gradio_interface(docx_path: str):
         fn=respond,
         title="🤖 Нейро-Менеджер Проектов (улучшенный поиск)",
         description="AI Assistant для управления ML-проектами\n" \
-                   "✅ Улучшенный поиск релевантной информации\n" \
-                   "❌ Не выдумывает ответы\n" \
-                   "📋 Специальная обработка запросов о декомпозиции",
+                   " Улучшенный поиск релевантной информации\n" \
+                   " Не выдумывает ответы\n" \
+                   " Специальная обработка запросов о декомпозиции",
         examples=[
             "Как разбить проект на подзадачи?",
             "Какие этапы включает ML-проект?",
@@ -658,7 +658,7 @@ def main():
     DOCX_FILE_PATH = "base.docx"
     
     if not os.path.exists(DOCX_FILE_PATH):
-        print(f"❌ Файл не найден: {DOCX_FILE_PATH}")
+        print(f" Файл не найден: {DOCX_FILE_PATH}")
         print(f"   Создайте файл base.docx с базой знаний")
         return
     
@@ -669,8 +669,8 @@ def main():
     try:
         demo = create_gradio_interface(DOCX_FILE_PATH)
         
-        print("\n🌐 Веб-интерфейс запускается...")
-        print("📡 Откройте в браузере: http://localhost:7860")
+        print("\n Веб-интерфейс запускается...")
+        print(" Откройте в браузере: http://localhost:7860")
         
         demo.launch(
             server_name="0.0.0.0",
@@ -680,7 +680,7 @@ def main():
         )
         
     except Exception as e:
-        print(f"❌ Критическая ошибка: {e}")
+        print(f" Критическая ошибка: {e}")
         import traceback
         traceback.print_exc()
 
